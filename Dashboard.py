@@ -16,7 +16,8 @@ df_sales = pd.read_csv('Clean_Dataset/manga_sales.csv', encoding = 'cp1252')
 st.set_page_config(layout="wide")
 
 #Background
-
+with open('./style.css') as css:
+    st.markdown('<style>' + css.read() + '</style>', unsafe_allow_html = True)
 
 #Setup containers
 container0 = st.container()
@@ -49,7 +50,7 @@ def plot1():
         ], height = 800
     )
 
-    fig.update_layout(font_size = 20)
+    fig.update_layout(font_size = 20, height = 700, plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 2
@@ -73,7 +74,7 @@ def plot3():
     ])
 
     # Change the bar mode
-    fig.update_layout(barmode='group', height = 650, margin_b = 150, colorway = ['#F47521', '#5b0bb5'], yaxis_title = "Score", yaxis_range=[0,10])
+    fig.update_layout(barmode='group', height = 650, margin_b = 150, colorway = ['#F47521', '#5b0bb5'], yaxis_title = "Score", yaxis_range=[0,10], plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 4
@@ -129,8 +130,7 @@ def plot4():
         visible = True,
         range = [0, 170]
         )),
-    showlegend = True, height = 750, font_size = 30
-    )
+    showlegend = True, height = 500, font_size = 20, plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 5
@@ -180,7 +180,7 @@ def plot5():
         color = colors
     ))])
 
-    fig.update_layout(font_size = 18)
+    fig.update_layout(font_size = 18, plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 6
@@ -207,6 +207,7 @@ def plot6():
     }
 
     fig = ff.create_gantt(timeline, colors = colors, index_col = "Type", show_colorbar = True, group_tasks = True, title = "")
+    fig.update_layout(plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 7
@@ -218,7 +219,7 @@ def plot7():
         sales.append(dict(Manga = df_sales['Manga series'][i], Sales = df_sales['Average sales per volume'][i], Type = "Volume"))
 
     fig = px.bar(sales, x="Manga", y="Sales", color="Type", color_discrete_sequence = ['#5b0bb5', '#F47521'])
-    fig.update_layout(yaxis_title = "Sold Copies (Millions)")
+    fig.update_layout(yaxis_title = "Sold Copies (Millions)", plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 8
@@ -231,7 +232,7 @@ def plot8():
         
 
     fig = px.scatter(input, x = "Scored", y = "Score", color = "Type", color_discrete_sequence = ['#5b0bb5', '#F47521'])
-    fig.update_layout(yaxis_title = "Average Score", xaxis_title = "Scored By")
+    fig.update_layout(yaxis_title = "Average Score", xaxis_title = "Scored By", plot_bgcolor='rgba(255,255,255,0.75)', paper_bgcolor='rgba(255,255,255,0.75)')
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 

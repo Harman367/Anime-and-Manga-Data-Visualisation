@@ -1,15 +1,11 @@
 #Imports
 import numpy as np
-import os
 import pandas as pd
 import plotly.express as px
 import streamlit as st
-import math
-import json
-from matplotlib.figure import Figure
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
 from ast import literal_eval
+import plotly.figure_factory as ff
 
 #Load files into dataframes
 df_anime = pd.read_csv('Clean_Dataset/anime_clean.csv')
@@ -29,7 +25,6 @@ container2 = st.container()
 container3 = st.container()
 container4 = st.container()
 container5 = st.container()
-container6 = st.container()
 
 #Plots
 
@@ -53,6 +48,8 @@ def plot1():
             'pink'
         ], height = 800
     )
+
+    fig.update_layout(font_size = 20)
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 2
@@ -76,7 +73,7 @@ def plot3():
     ])
 
     # Change the bar mode
-    fig.update_layout(barmode='group', height = 650, margin_b = 150, colorway = ['#F47521', '#5b0bb5'], yaxis_title = "Score")
+    fig.update_layout(barmode='group', height = 650, margin_b = 150, colorway = ['#F47521', '#5b0bb5'], yaxis_title = "Score", yaxis_range=[0,10])
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
 #Plot 4
@@ -136,6 +133,109 @@ def plot4():
     )
     st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
 
+#Plot 5
+def plot5():
+    values = []
+
+    values.append(df_anime['total'].sum())
+    values.append(df_manga['total'].sum())
+    values.append(df_anime['watching'].sum())
+    values.append(df_manga['reading'].sum())
+    values.append(df_anime['completed'].sum())
+    values.append(df_manga['completed'].sum())
+    values.append(df_anime['on_hold'].sum())
+    values.append(df_manga['on_hold'].sum())
+    values.append(df_anime['dropped'].sum())
+    values.append(df_manga['dropped'].sum())
+    values.append(df_anime['plan_to_watch'].sum())
+    values.append(df_manga['plan_to_read'].sum())
+
+    colors = [       
+    'rgba(244, 117, 33 , 0.75)',
+    'rgba(244, 117, 33 , 0.75)',
+    'rgba(100, 20, 200, 0.5)',
+    'rgba(0, 0, 255, 0.5)',
+    'rgba(0, 255, 0, 0.5)',
+    'rgba(255, 0, 0, 0.5)',
+    'rgba(255, 0, 255, 1)',
+    'rgba(0, 255, 255, 0.5)',
+    'rgba(139, 128, 0, 1)',
+    'rgba(255, 125, 125, 0.5)',
+    'rgba(125, 255, 125, 0.5)',
+    'rgba(125, 125, 255, 0.5)'
+    ]
+
+    fig = go.Figure(data=[go.Sankey(
+        node = dict(
+        pad = 20,
+        thickness = 25,
+        line = dict(color = 'black', width = 2),
+        label = ["Total", "Anime", "Manga", "Watching / Reading", "Completed", "On hold", "Dropped", "Plan to watch / read"],
+        color = '#5b0bb5'
+        ),
+        link = dict(
+        source = [0, 0, 1, 2, 1, 2, 1, 2, 1, 2, 1, 2],
+        target = [1, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7],
+        value = values,
+        color = colors
+    ))])
+
+    fig.update_layout(font_size = 18)
+    st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
+
+#Plot 6
+def plot6():
+    timeline = []
+
+    for i in range(10):
+        timeline.append(dict(Task = df_sales['Manga series'][i], Start = str(df_sales['Start'][i]), Finish = str(df_sales['End'][i]), Type = 'Manga'))
+
+    timeline.append(dict(Task = df_sales['Manga series'][0], Start = "1999", Finish = "2023", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][1], Start = "1986", Finish = "1996", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][2], Start = "2008", Finish = "2009", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][3], Start = "2023", Finish = "2023", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][4], Start = "1996", Finish = "2023", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][5], Start = "2002", Finish = "2017", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][6], Start = "1993", Finish = "2011", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][7], Start = "1993", Finish = "1996", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][8], Start = "2023", Finish = "2023", Type = 'Anime'))
+    timeline.append(dict(Task = df_sales['Manga series'][9], Start = "2019", Finish = "2023", Type = 'Anime'))
+
+    colors = {
+        'Manga': '#5b0bb5',
+        'Anime': '#F47521'
+    }
+
+    fig = ff.create_gantt(timeline, colors = colors, index_col = "Type", show_colorbar = True, group_tasks = True, title = "")
+    st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
+
+#Plot 7
+def plot7():
+    sales = []
+
+    for i in range(10):
+        sales.append(dict(Manga = df_sales['Manga series'][i], Sales = (df_sales['Approximate sales'][i] - df_sales['Average sales per volume'][i]), Type = "Sales"))
+        sales.append(dict(Manga = df_sales['Manga series'][i], Sales = df_sales['Average sales per volume'][i], Type = "Volume"))
+
+    fig = px.bar(sales, x="Manga", y="Sales", color="Type", color_discrete_sequence = ['#5b0bb5', '#F47521'])
+    fig.update_layout(yaxis_title = "Sold Copies (Millions)")
+    st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
+
+#Plot 8
+def plot8():
+    input = []
+
+    for i in range(50):
+        input.append(dict(Scored = df_anime['scored_by'][i], Score = df_anime['score'][i], Type = "Anime"))
+        input.append(dict(Scored = df_manga['scored_by'][i], Score = df_manga['score'][i], Type = "Manga"))
+        
+
+    fig = px.scatter(input, x = "Scored", y = "Score", color = "Type", color_discrete_sequence = ['#5b0bb5', '#F47521'])
+    fig.update_layout(yaxis_title = "Average Score", xaxis_title = "Scored By")
+    st.plotly_chart(fig, theme = "streamlit", use_container_width = True)
+
+
+
 #Introduction
 with container0:
     st.header("Anime and Manga Comparison")
@@ -168,31 +268,36 @@ with container2:
     with col3:
         st.subheader("Spread of Demographics")
         plot4()
+        st.write("Shounen: Young Male")
+        st.write("Seinen: Young Adult Male")
+        st.write("Shoujo: Young Female")
+        st.write("Josei: Young Adult Female")
 
 
+
+#Container
+with container3:
+    st.subheader("Top 50 Anime and Manga Scores vs Number of People who Scored")
+    plot8()
 
 
 #Columns
-with container3:
-    #Create columns
-    col5, col4 = st.columns((2,1))
+with container4:
+    col6, col7 = st.columns(2)
 
-    #Plot 5
-    with col4:
-        st.header("Plot 5")
+    #Plot 6
+    with col6:
+        st.subheader("Publication of Top 10 Manga Sales and thier Anime release")
+        plot6()
 
-    #Columns
-    with col5:
-        with container4:
-            col6, col7 = st.columns(2)
+    
+    with col7:
+        
+        #Plot 5
+        st.subheader("Status of Anime and Manga Consumers")
+        plot5()
 
-            #Plot 6
-            with col6:
-                st.header("Plot 6")
-
-            #Plot 7
-            with col7:
-                st.header("Plot 7")    
-
-            with container5:
-                st.header("Plot 8") 
+#Plot 7
+with container5: 
+    st.subheader("Top 10 Manga Sales and Average Sales per Volume")
+    plot7()    

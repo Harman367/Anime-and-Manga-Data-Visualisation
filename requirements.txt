@@ -1,8 +1,5 @@
 numpy
 pandas
 plotly
-plotly.express
 streamlit
-plotly.graph_objects
 literal_eval
-plotly.figure_factory 
